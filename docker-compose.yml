@@ -1,0 +1,88 @@
+
+services:
+  order-db:
+    image: postgres:15-alpine
+    container_name: order-db
+    environment:
+      POSTGRES_DB: orders
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret123
+    ports:
+      - "5432:5432"
+    volumes:
+      - order-db-data:/var/lib/postgresql/data
+      - ./order-service/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  payment-db:
+    image: postgres:15-alpine
+    container_name: payment-db
+    environment:
+      POSTGRES_DB: payments
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret123
+    ports:
+      - "5433:5432"
+    volumes:
+      - payment-db-data:/var/lib/postgresql/data
+      - ./payment-service/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    environment:
+      DB_HOST: payment-db
+      DB_USER: postgres
+      DB_PASSWORD: secret123
+      DB_NAME: payments
+      DB_PORT: 5432
+      PORT: 8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      payment-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    environment:
+      DB_HOST: order-db
+      DB_USER: postgres
+      DB_PASSWORD: secret123
+      DB_NAME: orders
+      DB_PORT: 5432
+      PORT: 8080
+      PAYMENT_SERVICE_URL: http://payment-service:8081
+    ports:
+      - "8080:8080"
+    depends_on:
+      order-db:
+        condition: service_healthy
+      payment-service:
+        condition: service_started
+    networks:
+      - app-network
+
+volumes:
+  order-db-data:
+  payment-db-data:
+
+networks:
+  app-network:
+    driver: bridge
