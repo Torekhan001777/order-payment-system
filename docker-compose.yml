@@ -50,8 +50,10 @@ services:
       DB_NAME: payments
       DB_PORT: 5432
       PORT: 8081
+      PAYMENT_GRPC_PORT: 9091
     ports:
       - "8081:8081"
+      - "9091:9091"
     depends_on:
       payment-db:
         condition: service_healthy
@@ -68,9 +70,11 @@ services:
       DB_NAME: orders
       DB_PORT: 5432
       PORT: 8080
-      PAYMENT_SERVICE_URL: http://payment-service:8081
+      ORDER_GRPC_PORT: 9090
+      PAYMENT_GRPC_ADDR: payment-service:9091
     ports:
       - "8080:8080"
+      - "9090:9090"
     depends_on:
       order-db:
         condition: service_healthy

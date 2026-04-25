@@ -27,6 +27,7 @@ go.work.sum
 .idea/
 *.swp
 *.swo
+.postman/
 
 # OS
 .DS_Store
