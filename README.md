@@ -1,8 +1,8 @@
 # Order Payment System (Assignment 2 gRPC)
 
-## Repository Links (fill with your real GitHub URLs)
-- Proto repository: `https://github.com/<your-username>/order-payment-protos`
-- Generated code repository: `https://github.com/<your-username>/order-payment-generated`
+## Repository Links
+- Proto repository: `https://github.com/torekhan001777/order-payment-protos`
+- Generated code repository: `https://github.com/torekhan001777/order-payment-generated`
 
 ## Architecture
 ```mermaid
